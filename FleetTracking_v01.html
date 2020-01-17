@@ -31,18 +31,18 @@
 
         //Data points for a path, could be from a GPS device.
         var points = [
-            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.34758, 47.62155] }, properties: { speed: 55 } },
-            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.34764, 47.61859] }, properties: { speed: 57 } },
-            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.33787, 47.61295] }, properties: { speed: 70 } },
-            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.34217, 47.60964] }, properties: { speed: 60 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.34758, 47.62155] }, properties: { speed: 55 ,"temperature": 60 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.34764, 47.61859] }, properties: { speed: 57 ,"temperature": 72 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.33787, 47.61295] }, properties: { speed: 70 ,"temperature": 50} },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.34217, 47.60964] }, properties: { speed: 60 ,"temperature": 80 } },
         ];
-
+		
         function GetMap() {
             //Initialize a map instance.
             map = new atlas.Map('myMap', {
                 center: [-122.345, 47.615],
                 zoom: 14,
-				//style: 'grayscale_dark',
+				style: 'road',
                 view: 'Auto',
 				
 				//Add your Azure Maps subscription key to the map SDK. Get an Azure Maps key at https://azure.com/maps
@@ -51,8 +51,34 @@
                     subscriptionKey: 'x4OKrH-wlKiAZgo6GMH8NECEN7hlZgorUcgkPy1xQaU'
                 }
             });
+			
             //Wait until the map resources are ready.
             map.events.add('ready', function () {
+
+			/* Construct and add a compass control*/
+			  var compassControl = new atlas.control.CompassControl();
+			  map.controls.add(compassControl, {
+				position: "bottom-right"
+			  });
+
+			  /* Construct and add a zoom control*/
+			  var zoomControl = new atlas.control.ZoomControl();
+			  map.controls.add(zoomControl, {
+				position: "bottom-right"
+			  });
+
+			  /* Construct and add a pitch control*/
+			  var pitchControl = new atlas.control.PitchControl();
+			  map.controls.add(pitchControl, {
+				position: "bottom-right"
+			  });
+
+			  /* Construct and add a style control*/
+			  var styleControl = new atlas.control.StyleControl();
+			  map.controls.add(styleControl, {
+			  position: "bottom-right"
+			  })
+			
 
                 //Load a custom image icon into the map resources.
                 map.imageSprite.add('arrow-icon', './Common/images/icons/truck.png').then(function () {

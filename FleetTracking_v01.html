@@ -16,10 +16,10 @@
 
     <script type='text/javascript'>
 	
-        var map, pin, datasource,marker;
-        var animationTime = 6000;
+        var map, pin, datasource,marker,popup;
+        var animationTime = 5000;
         var animation;
-		
+				
         //Create an array of points to define a path to animate along.
         var path = [
            [-122.34758, 47.62155],
@@ -31,10 +31,10 @@
 
         //Data points for a path, could be from a GPS device.
         var points = [
-            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.34758, 47.62155] }, properties: { speed: 55 ,"temperature": 60 } },
-            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.34764, 47.61859] }, properties: { speed: 57 ,"temperature": 72 } },
-            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.33787, 47.61295] }, properties: { speed: 70 ,"temperature": 50} },
-            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.34217, 47.60964] }, properties: { speed: 60 ,"temperature": 80 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.34758, 47.62155] }, properties: { speed: 55 , risk : "low"} },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.34764, 47.61859] }, properties: { speed: 57  ,risk : "low"} },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.33787, 47.61295] }, properties: { speed: 70 ,risk : "high"} },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.34217, 47.60964] }, properties: { speed: 60 , risk : "medium"} },
         ];
 		
         function GetMap() {
@@ -44,6 +44,8 @@
                 zoom: 14,
 				style: 'road',
                 view: 'Auto',
+               //Set the language of the map.
+                language: 'en-US',
 				
 				//Add your Azure Maps subscription key to the map SDK. Get an Azure Maps key at https://azure.com/maps
                 authOptions: {
@@ -54,6 +56,114 @@
 			
             //Wait until the map resources are ready.
             map.events.add('ready', function () {
+
+
+                //Create a data source and add it to the map.
+                datasource = new atlas.source.DataSource(null, {
+                    cluster: true
+                });
+                map.sources.add(datasource);
+
+                //Add sample data.
+				datasource.add([
+                    new atlas.data.Feature(new atlas.data.Point([-122.34764, 47.61859]), {
+                        title: 'COP-1',
+                        message: 'Live feed of the Vehicle',
+						content: '<iframe style="margin:10px" width="400" height="200" src="https://channel9.msdn.com/Shows/Internet-of-Things-Show/Azure-Maps-intro-for-developers/player" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>',
+						pixelOffset: [0, 0],
+                        url: 'https://aka.ms/AzureMapsSamples',
+                        email: 'info@microsoft.com',
+                        popupTemplate: {
+                            detectHyperlinks: true
+                        }
+                    }),
+
+                    <!-- new atlas.data.Feature(new atlas.data.Point([-122.33787, 47.61295]), { -->
+                        <!-- title: 'COP-2 - PropertyInfo', -->
+                        <!-- createDate: new Date(), -->
+                        <!-- dateNumber: 1569880860542, -->
+                        <!-- url: 'https://aka.ms/AzureMapsSamples', -->
+                        <!-- email: 'info@microsoft.com', -->
+                        <!-- popupTemplate: { -->
+                            <!-- content: [ -->
+                                <!-- { -->
+                                    <!-- propertyPath: 'createDate', -->
+                                    <!-- label: 'Created Date' -->
+                                <!-- }, -->
+                                <!-- { -->
+                                    <!-- propertyPath: 'dateNumber', -->
+                                    <!-- label: 'Formatted date from number', -->
+                                    <!-- dateFormat: { -->
+                                        <!-- weekday: 'long', -->
+                                        <!-- year: 'numeric', -->
+                                        <!-- month: 'long', -->
+                                        <!-- day: 'numeric', -->
+                                        <!-- timeZone: 'UTC', -->
+                                        <!-- timeZoneName: 'short' -->
+                                    <!-- } -->
+                                <!-- }, -->
+                                <!-- { -->
+                                    <!-- propertyPath: 'url', -->
+                                    <!-- label: 'Code samples', -->
+                                    <!-- hideLabel: true, -->
+                                    <!-- hyperlinkFormat: { -->
+                                        <!-- lable: 'Go to code samples!', -->
+                                        <!-- target: '_blank' -->
+                                    <!-- } -->
+                                <!-- }, -->
+                                <!-- { -->
+                                    <!-- propertyPath: 'email', -->
+                                    <!-- label: 'Email us', -->
+                                    <!-- hideLabel: true, -->
+                                    <!-- hyperlinkFormat: { -->
+                                        <!-- target: '_blank', -->
+                                        <!-- scheme: 'mailto:' -->
+                                    <!-- } -->
+                                <!-- } -->
+                            <!-- ] -->
+                        <!-- } -->
+                    <!-- }), -->
+
+                    new atlas.data.Feature(new atlas.data.Point([-122.34217, 47.60964]), {
+                        title: 'COP-3',
+                        value1: 1.2345678,
+                        value2: {
+                            subValue: 'Pizza'
+                        },
+                        arrayValue: [3, 4, 5, 6],
+                        imageLink: 'https://azuremapscodesamples.azurewebsites.net/common/images/Pike_Market.jpg',
+                        popupTemplate: {
+                            content: [
+                                'This template has two pieces of content; a string template with placeholders and a array of property info which renders a full width image.<br/><br/> - Value 1 = {value1}<br/> - Value 2 = {value2/subValue}<br/> - Array value [2] = {arrayValue/2}',
+                                [
+                                    {
+                                        propertyPath: 'imageLink',
+                                        label: 'COP',
+                                        hideImageLabel: true,
+                                        hyperlinkFormat: {
+                                            isImage: true
+                                        }
+                                    }
+                                ]
+                            ],
+                            numberFormat: {
+                                maximumFractionDigits: 2
+                            }
+                        }
+                    }),
+                ]);
+
+                //Add a layer for rendering point data as symbols.
+				var layer = new atlas.layer.BubbleLayer(datasource);
+                map.layers.add(layer);
+				
+                //Create a popup but leave it closed so we can update it and display it later.
+				popup = new atlas.Popup();
+
+                //Add a click event to the symbol layer.
+                map.events.add('click', layer, showPopup);
+
+
 
 			/* Construct and add a compass control*/
 			  var compassControl = new atlas.control.CompassControl();
@@ -83,33 +193,38 @@
                 //Load a custom image icon into the map resources.
                 map.imageSprite.add('arrow-icon', './Common/images/icons/truck.png').then(function () {
 				 
-				 
 				 //Create a data source and add it to the map.   --added -1
                 datasource = new atlas.source.DataSource(null, {
                     lineMetrics: true   //Enable line metrics on the data source. This is needed to enable support for strokeGradient.
                 });
 				 
-                 map.sources.add(datasource);	 
-				datasource.add(new atlas.data.Feature(new atlas.data.LineString(path)));
+                 map.sources.add(datasource);	
+				 //datasource.add(points);
+                //Create a line from the points and add it to the data source.
+                var line = createLineFrom(points);
+                datasource.add(line);
 				
+				//Calculate a color gradient expression based on the speed of each data point.
+                var speedGradient = calculateGradientExpression(points, line);
 
-                 //Create a line for the path and add it to the data source.
-                   datasource.add(new atlas.data.LineString(path));
-				   
-				                 //Create a line layer and pass in a gradient expression for the strokeGradient property.
+                //Create a line layer and pass in a gradient expression for the strokeGradient property.
                 map.layers.add(new atlas.layer.LineLayer(datasource, null, {
-                    strokeWidth: 3,
-                    strokeGradient: [
-                        'interpolate',
-                        ['linear'],
-                        ['line-progress'],
-                        0.3, "royalblue",
-                        0.5, "lime",
-                        0.7, "red",
-                        1, "blue"
-                    ]
+                    strokeWidth: 4,
+                    strokeGradient: speedGradient
                 }));
-				   
+
+                //Create a layer to render each data point along the path.
+                var pointLayer = new atlas.layer.SymbolLayer(datasource, null, {
+                    //Only render point data in this layer, not the points of the line.
+                    filter: ['==', ['geometry-type'], 'Point']
+                });
+	
+
+                //Open/close the popup when hovered.
+                map.events.add('mousemove', pointLayer, pointClicked);
+                map.events.add('mouseout', pointLayer, closePopup);
+
+                map.layers.add(pointLayer);
 				   
                  //Create a layer to render a symbol which we will animate.
                     map.layers.add(new atlas.layer.SymbolLayer(datasource, null, {
@@ -166,7 +281,7 @@
 				position: [-122.34758, 47.62155],
 				popup: new atlas.Popup({
 				content: '<div style="padding:10px"><font color="white">Driver Name : BUNJONG BORIBOON ,<br>TT Number : KA 01 EU0073, <br>Fleet_Risk_Assesment :</font><font color="yellow"> Medium</font> </div>',
-				pixelOffset: [0, -20],
+				pixelOffset: [0, -30],
 				fillColor: 'rgba(0,0,0,0.4)',
 				draggable: true
 
@@ -183,6 +298,94 @@
             });
         }
 		
+         function showPopup(e) {
+            if (e.shapes && e.shapes.length > 0) {
+                var properties = e.shapes[0].getProperties();
+
+                popup.setOptions({
+                    //Update the content of the popup.
+                    content: atlas.PopupTemplate.applyTemplate(properties, properties.popupTemplate),
+
+                    //Update the position of the popup with the pins coordinate.
+                    position: e.shapes[0].getCoordinates()
+                });
+
+                //Open the popup.
+                popup.open(map);
+            }
+        }
+
+        function updateLanguage() {
+            var langOptions = document.getElementById('langOptions');
+            var lang = langOptions.options[langOptions.selectedIndex].value;
+            //Update the language of the map instance.
+            map.setStyle({
+                language: lang
+            });
+        }
+		
+		
+		        function createLineFrom(points) {
+            var coords = [];
+            for (var i = 0; i < points.length; i++) {
+                coords.push(points[i].geometry.coordinates);
+            }
+            return new atlas.data.LineString(coords);
+        }
+
+        function calculateGradientExpression(points, line) {
+            var exp = [
+                'interpolate',  //This will cause the colors from each data point to create a gradient between points.
+                ['linear'],
+                ['line-progress']
+            ];
+
+            //Get the total length of the path.
+            var totalLength = atlas.math.getLengthOfPath(line);
+
+            //The line progress will be a fraction of the total length of the path,
+            //so we can calculate the line progress value of each data point and set the color accordingly.
+            var progress = 0;
+
+            for (var i = 0; i < points.length; i++) {
+                //The line progress value is a value between 0 and 1. 
+                //Taking the travelled distance and dividing it by the total distance of the path, will give us the line progress value.
+                exp.push(progress / totalLength);
+
+                //Add our business logic on how a data point should be colored based on the speed.
+
+                if (points[i].properties.speed <= 60) {
+                    exp.push('green');
+                } else if (points[i].properties.speed < 70) {
+                    exp.push('yellow');
+                } else {
+                    exp.push('red');
+                }
+
+                if (i < points.length - 1) {
+                    progress += atlas.math.getDistanceTo(points[i], points[i + 1]);
+                }
+            }
+
+            return exp;
+        }
+
+        function pointClicked(e) {
+            var prop = e.shapes[0].getProperties();
+
+            popup.setOptions({
+                //content: '<div style="padding:10px;">Speed: ' + prop.speed + 'mph ,'+ prop.risk +' </div>',
+				content: '<div style="padding:10px;">Speed: ' + 60 + 'mph ,'+ 'Risk :' + 'Medium' +' </div>',
+                position: e.shapes[0].getCoordinates()
+            });
+
+            popup.open(map);
+        }
+
+        function closePopup() {
+            popup.close();
+        }
+    	
 		
         function play() {
             if (animation) {
@@ -201,7 +404,7 @@
         }
         var animations = (function () {
             var self = this;
-            var _delay = 20; //30 = 33.3 frames per second, 16 = 62.5 frames per second
+            var _delay = 30; //30 = 33.3 frames per second, 16 = 62.5 frames per second
             this.PathAnimation = function (path, intervalCallback, duration) {
                 /// <summary>This class extends from the BaseAnimation class and cycles through a set of positions over a period of time, calculating mid-point positions along the way.</summary>
                 /// <param name="path" type="Position[]">An array of positions to cycle through.</param>
@@ -278,7 +481,7 @@
                                     var progress = (frameIdx * _delay) / duration;
                                     renderFrameCallback(progress, frameIdx);
                                     if (progress >= 1) {
-                                        //reset();
+                                        reset();
                                     }
                                     frameIdx++;
                                 }
@@ -308,13 +511,13 @@
             return self;
         })();
     </script>
-	
+
     <style>
         #myMap {
             position: relative;
             width: 100%;
             min-width:290px;
-            height: 600px;
+            height: 550px;
         }
         .controlPanel {
             position:absolute;
@@ -343,6 +546,52 @@
 			<br/>
 			Follow: <input id="followSymbol" type="checkbox"/>
 		</div>
+
+
+
+    <div style="clear:both;padding-top:10px;">
+
+        Language:
+
+        <select id="langOptions" onchange="updateLanguage()">
+            <option value="NGT">Neutral Ground Truth (NGT)</option>
+            <option value="NGT-Latn">Neutral Ground Truth - Latin exonyms (NGT-Latn)</option>
+            <option value="ar">Arabic (ar)</option>
+            <option value="bg">Bulgarian (bg)</option>
+            <option value="bg-BG">Bulgarian (Bulgaria) (bg-BG)</option>
+            <option value="ca-ES">Catalan (Spain) (ca-ES)</option>
+            <option value="cs">Czech (cs)</option>
+            <option value="cs-CZ">Czech (Czech Republic) (cs-CZ)</option>
+            <option value="da">Danish (da)</option>
+            <option value="da-DK">Danish (Denmark) (da-DK)</option>
+            <option value="nl">Dutch (Netherlands) (nl)</option>
+            <option value="nl-NL">Dutch (Netherlands) (nl-NL)</option>
+            <option value="en">English (en)</option>
+            <option value="en-AU">English (Australia) (en-AU)</option>
+            <option value="en-CA">English (Canada) (en-CA)</option>
+            <option value="en-GB">English (United Kingdom) (en-GB)</option>
+            <option value="en-NZ">English (New Zealand) (en-NZ)</option>
+            <option value="en-US" selected="selected">English (United States) (en-US)</option>
+            <option value="fi">Finnish (fi)</option>
+            <option value="fi-FI">Finnish (Finland) (fi-FI)</option>
+            <option value="fr">French (fr)</option>
+            <option value="fr-FR">French (France) (fr-FR)</option>
+            <option value="de">German (de)</option>
+            <option value="de-DE">German (Germany) (de-DE)</option>
+            <option value="lt">Lithuanian (lt)</option>
+            <option value="lt-LT">Lithuanian (lt-LT)</option>
+            <option value="ms-MY">Malay (ms-MY)</option>
+            <option value="nb-NO">Norwegian, Bokmal (Norway) (nb-NO)</option>
+            <option value="pl">Polish (pl)</option>
+            <option value="pl-PL">Polish (Poland) (pl-PL)</option>
+            <option value="pt">Portuguese (Brazil) (pt)</option>
+            <option value="pt-BR">Portuguese (Brazil) (pt-BR)</option>
+            <option value="pt-PT">Portuguese (Portugal) (pt-PT)</option>
+
+        </select>
+
+    </div>
+
 
 		<fieldset style="width:calc(100% - 30px);min-width:290px;margin-top:10px;">
 			<legend><h1 style="font-size:16px">Fleet Tracking management</h1></legend>

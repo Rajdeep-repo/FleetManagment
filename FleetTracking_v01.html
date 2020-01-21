@@ -13,35 +13,62 @@
     <!-- Add references to the Azure Maps Map control JavaScript and CSS files. -->
     <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css" type="text/css" />
     <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
+	
+	 <!-- Add a reference to the HtmlMarkerLayer script. -->
+    <script src="HtmlMarkerLayer.js"></script>
 
     <script type='text/javascript'>
 	
         var map, pin, datasource,marker,popup;
-        var animationTime = 5000;
+        var animationTime = 6000;
         var animation;
 				
         //Create an array of points to define a path to animate along.
         var path = [
-           [-122.34758, 47.62155],
-           [-122.34764, 47.61859],
-           [-122.33787, 47.61295],
-           [-122.34217, 47.60964]
+           [-122.18822, 47.63208],
+           [-122.18204, 47.63196],
+           [-122.17243, 47.62976],
+           [-122.16419, 47.63023],
+		   [-122.15852, 47.62942],
+		   [-122.15183, 47.62988],
+		   [-122.14256, 47.63451],
+		   [-122.13483, 47.64041],
+		   [-122.13466, 47.64422],
+		   [-122.13844, 47.65440],
+		   [-122.13277, 47.66515],
+		   [-122.12779, 47.66712],
+		   [-122.11595, 47.66712],
+		   [-122.11063, 47.66735],
+		   [-122.10668, 47.67035],
+		   [-122.10565, 47.67498]
 
         ];
 
         //Data points for a path, could be from a GPS device.
         var points = [
-            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.34758, 47.62155] }, properties: { speed: 55 , risk : "low"} },
-            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.34764, 47.61859] }, properties: { speed: 57  ,risk : "low"} },
-            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.33787, 47.61295] }, properties: { speed: 70 ,risk : "high"} },
-            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.34217, 47.60964] }, properties: { speed: 60 , risk : "medium"} },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.18822, 47.63208] }, properties: { speed: 55 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.18204, 47.63196] }, properties: { speed: 57 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.17243, 47.62976] }, properties: { speed: 58 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.16419, 47.63023] }, properties: { speed: 60 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.15852, 47.62942] }, properties: { speed: 62 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.15183, 47.62988] }, properties: { speed: 63 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.14256, 47.63451] }, properties: { speed: 61 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.13483, 47.64041] }, properties: { speed: 65 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.13466, 47.64422] }, properties: { speed: 67 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.13844, 47.65440] }, properties: { speed: 68 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.13277, 47.66515] }, properties: { speed: 70 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.12779, 47.66712] }, properties: { speed: 73 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.11595, 47.66712] }, properties: { speed: 75 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.11063, 47.66735] }, properties: { speed: 68 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.10668, 47.67035] }, properties: { speed: 64 } },
+            { type: 'Feature', geometry: { type: 'Point', coordinates: [-122.10565, 47.67498] }, properties: { speed: 60 } }
         ];
 		
         function GetMap() {
             //Initialize a map instance.
             map = new atlas.Map('myMap', {
-                center: [-122.345, 47.615],
-                zoom: 14,
+                center: [-122.135, 47.65],
+                zoom: 12,
 				style: 'road',
                 view: 'Auto',
                //Set the language of the map.
@@ -57,7 +84,6 @@
             //Wait until the map resources are ready.
             map.events.add('ready', function () {
 
-
                 //Create a data source and add it to the map.
                 datasource = new atlas.source.DataSource(null, {
                     cluster: true
@@ -66,95 +92,63 @@
 
                 //Add sample data.
 				datasource.add([
-                    new atlas.data.Feature(new atlas.data.Point([-122.34764, 47.61859]), {
-                        title: 'COP-1',
-                        message: 'Live feed of the Vehicle',
-						content: '<iframe style="margin:10px" width="400" height="200" src="https://channel9.msdn.com/Shows/Internet-of-Things-Show/Azure-Maps-intro-for-developers/player" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>',
-						pixelOffset: [0, 0],
-                        url: 'https://aka.ms/AzureMapsSamples',
-                        email: 'info@microsoft.com',
+                    new atlas.data.Feature(new atlas.data.Point([-122.17243, 47.62976]), {
+                        title: 'Check Point info',
+						Vehicle_Number: 'KA01 ME5612',
+						Route : 'A1 to B1',
+						Continous_driving_hours : '02:10:10',
+                        Average_speed: '55 mph',
+						Lane_violation: '0',
+						HA : '0',
+						HB : '0',
+						Risk_index:'low',
+						live_feed: '<iframe style="margin:10px" width="400" height="200" src="https://channel9.msdn.com/Shows/Internet-of-Things-Show/Azure-Maps-intro-for-developers/player" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>',                    
                         popupTemplate: {
                             detectHyperlinks: true
-                        }
+                        },
+						assigned: false
                     }),
 
-                    <!-- new atlas.data.Feature(new atlas.data.Point([-122.33787, 47.61295]), { -->
-                        <!-- title: 'COP-2 - PropertyInfo', -->
-                        <!-- createDate: new Date(), -->
-                        <!-- dateNumber: 1569880860542, -->
-                        <!-- url: 'https://aka.ms/AzureMapsSamples', -->
-                        <!-- email: 'info@microsoft.com', -->
-                        <!-- popupTemplate: { -->
-                            <!-- content: [ -->
-                                <!-- { -->
-                                    <!-- propertyPath: 'createDate', -->
-                                    <!-- label: 'Created Date' -->
-                                <!-- }, -->
-                                <!-- { -->
-                                    <!-- propertyPath: 'dateNumber', -->
-                                    <!-- label: 'Formatted date from number', -->
-                                    <!-- dateFormat: { -->
-                                        <!-- weekday: 'long', -->
-                                        <!-- year: 'numeric', -->
-                                        <!-- month: 'long', -->
-                                        <!-- day: 'numeric', -->
-                                        <!-- timeZone: 'UTC', -->
-                                        <!-- timeZoneName: 'short' -->
-                                    <!-- } -->
-                                <!-- }, -->
-                                <!-- { -->
-                                    <!-- propertyPath: 'url', -->
-                                    <!-- label: 'Code samples', -->
-                                    <!-- hideLabel: true, -->
-                                    <!-- hyperlinkFormat: { -->
-                                        <!-- lable: 'Go to code samples!', -->
-                                        <!-- target: '_blank' -->
-                                    <!-- } -->
-                                <!-- }, -->
-                                <!-- { -->
-                                    <!-- propertyPath: 'email', -->
-                                    <!-- label: 'Email us', -->
-                                    <!-- hideLabel: true, -->
-                                    <!-- hyperlinkFormat: { -->
-                                        <!-- target: '_blank', -->
-                                        <!-- scheme: 'mailto:' -->
-                                    <!-- } -->
-                                <!-- } -->
-                            <!-- ] -->
-                        <!-- } -->
-                    <!-- }), -->
+                    new atlas.data.Feature(new atlas.data.Point([-122.14256, 47.63451]), {
+                        title: 'Check Point info',
+						Vehicle_Number: 'KA01 ME5612',
+						Route : 'B1 to C1',
+						Continous_driving_hours : '04:20:30',
+                        Average_speed: '68 mph',
+						Overspeeding: '0',
+						Lane_violation: '0',
+						HA : '1',
+						HB : '2',
+						Risk_index:'medium',
+						assigned: false
+                    }),
 
-                    new atlas.data.Feature(new atlas.data.Point([-122.34217, 47.60964]), {
-                        title: 'COP-3',
-                        value1: 1.2345678,
-                        value2: {
-                            subValue: 'Pizza'
-                        },
-                        arrayValue: [3, 4, 5, 6],
-                        imageLink: 'https://azuremapscodesamples.azurewebsites.net/common/images/Pike_Market.jpg',
-                        popupTemplate: {
-                            content: [
-                                'This template has two pieces of content; a string template with placeholders and a array of property info which renders a full width image.<br/><br/> - Value 1 = {value1}<br/> - Value 2 = {value2/subValue}<br/> - Array value [2] = {arrayValue/2}',
-                                [
-                                    {
-                                        propertyPath: 'imageLink',
-                                        label: 'COP',
-                                        hideImageLabel: true,
-                                        hyperlinkFormat: {
-                                            isImage: true
-                                        }
-                                    }
-                                ]
-                            ],
-                            numberFormat: {
-                                maximumFractionDigits: 2
-                            }
-                        }
+                    new atlas.data.Feature(new atlas.data.Point([-122.12779, 47.66712]), {
+                        title: 'Check Point info',
+						Vehicle_Number: 'KA01 ME5612',
+						Route : 'A1 to D1',
+						Continous_driving_hours : '08:34:10',
+                        Average_speed: '74 mph',
+						Overspeeding: '6',
+						Lane_vialation: '2',
+						HA : '3',
+						HB : '4',
+						Risk_index:'High',
+                        COP: 'https://azuremapscodesamples.azurewebsites.net/common/images/Pike_Market.jpg',
+						assigned: true
                     }),
                 ]);
 
                 //Add a layer for rendering point data as symbols.
-				var layer = new atlas.layer.BubbleLayer(datasource);
+				var layer = new atlas.layer.SymbolLayer(datasource, null, {
+							iconOptions: {
+						image: [
+							'case',
+							['get', 'assigned'], 'pin-red',
+							'pin-darkblue'
+						]
+					}
+						  });
                 map.layers.add(layer);
 				
                 //Create a popup but leave it closed so we can update it and display it later.
@@ -193,7 +187,7 @@
                 //Load a custom image icon into the map resources.
                 map.imageSprite.add('arrow-icon', './Common/images/icons/truck.png').then(function () {
 				 
-				 //Create a data source and add it to the map.   --added -1
+				 //Create a data source and add it to the map. 
                 datasource = new atlas.source.DataSource(null, {
                     lineMetrics: true   //Enable line metrics on the data source. This is needed to enable support for strokeGradient.
                 });
@@ -216,7 +210,14 @@
                 //Create a layer to render each data point along the path.
                 var pointLayer = new atlas.layer.SymbolLayer(datasource, null, {
                     //Only render point data in this layer, not the points of the line.
-                    filter: ['==', ['geometry-type'], 'Point']
+                     filter: ['==', ['geometry-type'], 'Point'],
+						iconOptions: {
+						image: [
+							'case',
+							['get', 'assigned'], 'pin-red',
+							'pin-darkblueblue'
+						]
+					}
                 });
 	
 
@@ -278,7 +279,7 @@
 				var marker = new atlas.HtmlMarker({
 				color: 'DodgerBlue',
 				text: 'TT-1',
-				position: [-122.34758, 47.62155],
+				position: [-122.18822, 47.63208],
 				popup: new atlas.Popup({
 				content: '<div style="padding:10px"><font color="white">Driver Name : BUNJONG BORIBOON ,<br>TT Number : KA 01 EU0073, <br>Fleet_Risk_Assesment :</font><font color="yellow"> Medium</font> </div>',
 				pixelOffset: [0, -30],
@@ -325,7 +326,7 @@
         }
 		
 		
-		        function createLineFrom(points) {
+		function createLineFrom(points) {
             var coords = [];
             for (var i = 0; i < points.length; i++) {
                 coords.push(points[i].geometry.coordinates);
@@ -374,8 +375,7 @@
             var prop = e.shapes[0].getProperties();
 
             popup.setOptions({
-                //content: '<div style="padding:10px;">Speed: ' + prop.speed + 'mph ,'+ prop.risk +' </div>',
-				content: '<div style="padding:10px;">Speed: ' + 60 + 'mph ,'+ 'Risk :' + 'Medium' +' </div>',
+                content: '<div style="padding:10px;">Speed: '+ '0 mph </div>',
                 position: e.shapes[0].getCoordinates()
             });
 
@@ -481,7 +481,7 @@
                                     var progress = (frameIdx * _delay) / duration;
                                     renderFrameCallback(progress, frameIdx);
                                     if (progress >= 1) {
-                                        reset();
+                                        //reset();
                                     }
                                     frameIdx++;
                                 }
@@ -517,7 +517,7 @@
             position: relative;
             width: 100%;
             min-width:290px;
-            height: 550px;
+            height: 500px;
         }
         .controlPanel {
             position:absolute;
@@ -547,55 +547,64 @@
 			Follow: <input id="followSymbol" type="checkbox"/>
 		</div>
 
+		<fieldset style="width:calc(100% - 40px);min-width:290px;margin-top:2px;">
+			<legend><h1 style="font-size:15px">Driver Risk Index </h1></legend>
+			
+
+<table style="width: 1100px; height: 79px; float: left;" border="0.5" cellspacing="0" cellpadding="0"><caption>&nbsp;</caption>
+<tbody>
+<tr style="height: 41px;">
+<td style="width: 85px; height: 41px; text-align: left;"><span style="color: #000080;"><strong>DriverName</strong></span></td>
+<td style="width: 76px; height: 41px; text-align: left;"><span style="color: #000080;"><strong>Vehicle No</strong></span></td>
+<td style="width: 68px; height: 41px; text-align: left;"><span style="color: #000080;"><strong>Route</strong></span></td>
+<td style="width: 93px; height: 41px; text-align: left;"><span style="color: #000080;"><strong>Risk Rating</strong></span></td>
+<td style="width: 155px; height: 41px; text-align: left;"><span style="color: #000080;"><strong>Continuous Driveing hours (HH:MM)</strong></span></td>
+<td style="width: 95px; height: 41px; text-align: left;"><span style="color: #000080;"><strong>Overs speeding</strong></span></td>
+<td style="width: 98px; height: 41px; text-align: left;"><span style="color: #000080;"><strong>Lane violation</strong></span></td>
+<td style="width: 28px; height: 41px; text-align: left;"><span style="color: #000080;"><strong>HA</strong></span></td>
+<td style="width: 51.33px; height: 41px; text-align: left;"><span style="color: #000080;"><strong>HB</strong></span></td>
+<td style="width: 45.67px; height: 41px; text-align: left;"><span style="color: #000080;"><strong>HC</strong></span></td>
+<td style="width: 77px; height: 41px; text-align: left;"><span style="color: #000080;"><strong>Distraction</strong></span></td>
+<td style="width: 80px; height: 41px; text-align: left;"><span style="color: #000080;"><strong>yawning</strong></span></td>
+</tr>
+<tr style="height: 21.5px;">
+<td style="width: 85px; height: 21.5px; text-align: center;">Vijay&nbsp;</td>
+<td style="width: 76px; height: 21.5px; text-align: center;">Gj01FV1070</td>
+<td style="width: 68px; height: 21.5px; text-align: center;">A to B</td>
+<td style="width: 93px; height: 21.5px; text-align: center;">8.5</td>
+<td style="width: 155px; height: 21.5px; text-align: center;">02:50</td>
+<td style="width: 95px; height: 21.5px; text-align: center;">2</td>
+<td style="width: 98px; height: 21.5px; text-align: center;">0</td>
+<td style="width: 28px; height: 21.5px; text-align: center;">3</td>
+<td style="width: 51.33px; height: 21.5px; text-align: center;">7</td>
+<td style="width: 45.67px; height: 21.5px; text-align: center;">0</td>
+<td style="width: 77px; height: 21.5px; text-align: center;">1</td>
+<td style="width: 80px; height: 21.5px; text-align: center;">2</td>
+</tr>
+<tr style="height: 21px;">
+<td style="width: 85px; height: 21px; text-align: center;">Gurvinder</td>
+<td style="width: 76px; height: 21px; text-align: center;">GJ05KP2603</td>
+<td style="width: 68px; height: 21px; text-align: center;">B to C</td>
+<td style="width: 93px; height: 21px; text-align: center;">4.7</td>
+<td style="width: 155px; height: 21px; text-align: center;">03:12</td>
+<td style="width: 95px; height: 21px; text-align: center;">1</td>
+<td style="width: 98px; height: 21px; text-align: center;">0</td>
+<td style="width: 28px; height: 21px; text-align: center;">0</td>
+<td style="width: 51.33px; height: 21px; text-align: center;">2</td>
+<td style="width: 45.67px; height: 21px; text-align: center;">0</td>
+<td style="width: 77px; height: 21px; text-align: center;">0</td>
+<td style="width: 80px; height: 21px; text-align: center;">0</td>
+</tr>
+</tbody>
+</table>
+
+<p style="text-align: justify;"><span style="color: #000080;"><strong>&nbsp; &nbsp; &nbsp; Critical </strong></span><span style="color: #000080;"><strong>Alarm detials</strong></span></p>
+<p style="text-align: justify;">&nbsp; &nbsp; &nbsp;&nbsp; Risky Driving&nbsp;Event &nbsp; &nbsp; &nbsp;&nbsp; : Harsh Breaking on DD/MM/YYYY at HH:MM:SS <br />&nbsp; &nbsp; &nbsp;&nbsp; Vehicle Speed &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; : 60 kmph <br />&nbsp; &nbsp; &nbsp;&nbsp; Continous Driving Hours&nbsp; : 2 Hours 42 min <br />&nbsp; &nbsp; &nbsp;&nbsp; Distraction : &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; :Yes , <a title="alarm details" href="&lt;table style=&quot;width: 500px; height: 79px; float: left;&quot; border=&quot;0.5&quot; cellspacing=&quot;0&quot; cellpadding=&quot;0&quot;&gt;&lt;caption&gt;&lt;video poster=&quot;Play Video&quot; controls=&quot;controls">Play Video</a></p>
+<p>&nbsp;</p>
 
 
-    <div style="clear:both;padding-top:10px;">
 
-        Language:
-
-        <select id="langOptions" onchange="updateLanguage()">
-            <option value="NGT">Neutral Ground Truth (NGT)</option>
-            <option value="NGT-Latn">Neutral Ground Truth - Latin exonyms (NGT-Latn)</option>
-            <option value="ar">Arabic (ar)</option>
-            <option value="bg">Bulgarian (bg)</option>
-            <option value="bg-BG">Bulgarian (Bulgaria) (bg-BG)</option>
-            <option value="ca-ES">Catalan (Spain) (ca-ES)</option>
-            <option value="cs">Czech (cs)</option>
-            <option value="cs-CZ">Czech (Czech Republic) (cs-CZ)</option>
-            <option value="da">Danish (da)</option>
-            <option value="da-DK">Danish (Denmark) (da-DK)</option>
-            <option value="nl">Dutch (Netherlands) (nl)</option>
-            <option value="nl-NL">Dutch (Netherlands) (nl-NL)</option>
-            <option value="en">English (en)</option>
-            <option value="en-AU">English (Australia) (en-AU)</option>
-            <option value="en-CA">English (Canada) (en-CA)</option>
-            <option value="en-GB">English (United Kingdom) (en-GB)</option>
-            <option value="en-NZ">English (New Zealand) (en-NZ)</option>
-            <option value="en-US" selected="selected">English (United States) (en-US)</option>
-            <option value="fi">Finnish (fi)</option>
-            <option value="fi-FI">Finnish (Finland) (fi-FI)</option>
-            <option value="fr">French (fr)</option>
-            <option value="fr-FR">French (France) (fr-FR)</option>
-            <option value="de">German (de)</option>
-            <option value="de-DE">German (Germany) (de-DE)</option>
-            <option value="lt">Lithuanian (lt)</option>
-            <option value="lt-LT">Lithuanian (lt-LT)</option>
-            <option value="ms-MY">Malay (ms-MY)</option>
-            <option value="nb-NO">Norwegian, Bokmal (Norway) (nb-NO)</option>
-            <option value="pl">Polish (pl)</option>
-            <option value="pl-PL">Polish (Poland) (pl-PL)</option>
-            <option value="pt">Portuguese (Brazil) (pt)</option>
-            <option value="pt-BR">Portuguese (Brazil) (pt-BR)</option>
-            <option value="pt-PT">Portuguese (Portugal) (pt-PT)</option>
-
-        </select>
-
-    </div>
-
-
-		<fieldset style="width:calc(100% - 30px);min-width:290px;margin-top:10px;">
-			<legend><h1 style="font-size:16px">Fleet Tracking management</h1></legend>
-			This mockup requeires descprition to be added here ( Work in Progress). 
+			
 		</fieldset>
 	</body>
 
